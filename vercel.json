@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://9jatext.com.ng/admin/api/v1/:path*"
+    }
+  ]
+}
