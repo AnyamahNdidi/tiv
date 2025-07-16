@@ -27,11 +27,13 @@ import {
 import {
   useGetInspectionOverviewQuery,
   useGetUserOverviewQuery,
+  useGetInspectionDetailsQuery,
 } from "@/lib/redux/api/overviewApi";
 import TenantOverViewDetails from "../TenantOverViewDetails";
 import OverviewUserChart from "../OverviewCharts/OverviewUserChart";
 import OverviewUserTable from "../OverviewTables/OverviewUserTable";
 import UserOverviewDetails from "../UserOverviewDetails";
+import InspectionDetails from "../InspectionDetails";
 
 const TABS = {
   REVENUE: "Revenue",
@@ -69,6 +71,13 @@ const OverviewHeader = () => {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const { data: userDetailsData, isLoading: userDetailsLoading } =
     useGetUserDetailsQuery(selectedUserId, { skip: !selectedUserId });
+  const [selectedInspectionId, setSelectedInspectionId] = useState<
+    number | null
+  >(null);
+  const { data: inspectionDetails, isLoading: inspectionDetailsLoading } =
+    useGetInspectionDetailsQuery(selectedInspectionId, {
+      skip: !selectedInspectionId,
+    });
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -132,11 +141,28 @@ const OverviewHeader = () => {
         );
       case TABS.INSPECTION:
         if (inspectionLoading) return <div>Loading inspection data...</div>;
+
+        if (selectedInspectionId) {
+          if (inspectionDetailsLoading)
+            return <div>Loading inspection details...</div>;
+          if (!inspectionDetails) return null;
+
+          return (
+            <InspectionDetails
+              inspection={inspectionDetails}
+              onClose={() => setSelectedInspectionId(null)}
+            />
+          );
+        }
+
         return (
           <>
             <OverviewInspectionChart data={inspectionData} />
             <OverviewInspectionTable
               inspections={inspectionData?.inspections}
+              onViewDetails={(inspectionId) =>
+                setSelectedInspectionId(inspectionId)
+              }
             />
           </>
         );
@@ -154,6 +180,7 @@ const OverviewHeader = () => {
             <UserOverviewDetails
               user={userDetailsData}
               onClose={() => setSelectedUserId(null)}
+              userId={selectedUserId}
             />
           );
         }

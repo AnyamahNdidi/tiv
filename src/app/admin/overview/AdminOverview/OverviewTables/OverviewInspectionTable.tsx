@@ -13,6 +13,7 @@ interface InspectionTableProps {
     page_size: number;
     total_count: number;
     data: Array<{
+      id: number;
       tenant_name: string;
       account_id: string;
       email: string;
@@ -20,10 +21,12 @@ interface InspectionTableProps {
       status: string;
     }>;
   };
+  onViewDetails: (id: number) => void;
 }
 
 export default function OverviewInspectionTable({
   inspections,
+  onViewDetails,
 }: InspectionTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -108,7 +111,12 @@ export default function OverviewInspectionTable({
                       <StatusBadge status={request.status} />
                     </td>
                     <td className="py-3 px-4 font-medium text-gray-700 cursor-pointer">
-                      <StatusBadge status="View" />
+                      <button
+                        onClick={() => onViewDetails(request.id)}
+                        className="text-[#EC5F34] hover:text-[#e0502a] font-medium"
+                      >
+                        View Details
+                      </button>
                     </td>
                   </tr>
                 ))

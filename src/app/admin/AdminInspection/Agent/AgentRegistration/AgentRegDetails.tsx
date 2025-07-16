@@ -41,14 +41,14 @@ const AgentRegDetails: React.FC<RegistrationDetailsProps> = ({
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2">
+          {/* <div className="flex flex-col sm:flex-row gap-2">
             <button className="px-4 py-2 rounded text-gray-700 bg-white text-sm font-semibold border border-gray-300">
               Accept
             </button>
             <button className="px-4 py-2 rounded bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold">
               Reject
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Registration Info */}

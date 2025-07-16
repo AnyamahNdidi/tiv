@@ -19,6 +19,8 @@ import { verificationApi } from "../redux/api/verificationApi";
 import { inspectionApi } from "../redux/api/inspectionApi";
 import { overviewApi } from "../redux/api/overviewApi";
 import { adminUserApi } from "../redux/api/adminUserApi";
+import { authorizationApi } from "./api/authorizationApi";
+import { subscriptionApi } from "./api/subscriptionApi";
 import { fi } from "zod/v4/locales";
 
 const createNoopStorage = () => ({
@@ -52,6 +54,8 @@ const rootReducer = combineReducers({
   [inspectionApi.reducerPath]: inspectionApi.reducer,
   [overviewApi.reducerPath]: overviewApi.reducer,
   [adminUserApi.reducerPath]: adminUserApi.reducer,
+  [authorizationApi.reducerPath]: authorizationApi.reducer,
+  [subscriptionApi.reducerPath]: subscriptionApi.reducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -69,7 +73,9 @@ export const makeStore = () => {
         verificationApi.middleware,
         inspectionApi.middleware,
         overviewApi.middleware,
-        adminUserApi.middleware
+        adminUserApi.middleware,
+        authorizationApi.middleware,
+        subscriptionApi.middleware
       ),
   });
 

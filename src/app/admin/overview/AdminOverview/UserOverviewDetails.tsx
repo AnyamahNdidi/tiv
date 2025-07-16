@@ -46,9 +46,14 @@ interface UserDetailsProps {
     };
   };
   onClose: () => void;
+  userId: number;
 }
 
-const UserOverviewDetails: React.FC<UserDetailsProps> = ({ user, onClose }) => {
+const UserOverviewDetails: React.FC<UserDetailsProps> = ({
+  user,
+  onClose,
+  userId,
+}) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
@@ -80,7 +85,7 @@ const UserOverviewDetails: React.FC<UserDetailsProps> = ({ user, onClose }) => {
         <ModalWrapper onClose={() => setShowVerifyUserModal(false)}>
           <VerifyUserModal
             onClose={() => setShowVerifyUserModal(false)}
-            userId={user.user_info.id}
+            userId={userId}
           />
         </ModalWrapper>
       )}
@@ -88,7 +93,7 @@ const UserOverviewDetails: React.FC<UserDetailsProps> = ({ user, onClose }) => {
         <ModalWrapper onClose={() => setShowVerifyBVNModal(false)}>
           <VerifyBVNModal
             onClose={() => setShowVerifyBVNModal(false)}
-            userId={user.user_info.id}
+            userId={userId}
           />
         </ModalWrapper>
       )}
@@ -96,7 +101,7 @@ const UserOverviewDetails: React.FC<UserDetailsProps> = ({ user, onClose }) => {
         <ModalWrapper onClose={() => setShowBlockUserModal(false)}>
           <BlockUserModal
             onClose={() => setShowBlockUserModal(false)}
-            userId={user.user_info.id}
+            userId={userId}
           />
         </ModalWrapper>
       )}
@@ -147,10 +152,10 @@ const UserOverviewDetails: React.FC<UserDetailsProps> = ({ user, onClose }) => {
             title="Available Tokens"
             value={user.user_info.total_available_token}
           />
-          {/* <StatCard
+          <StatCard
             title="Wallet Balance"
-            value={`₦${user.user_info.Wallet_balance.toLocaleString()}`}
-          /> */}
+            value={`₦${user.user_info.Wallet_balance}`}
+          />
           <StatCard
             title="Total Properties"
             value={user.summary.total_property_added}

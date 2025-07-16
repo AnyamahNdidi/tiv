@@ -39,6 +39,13 @@ export const overviewApi = createApi({
       query: () => "/overview/inspection/",
       providesTags: ["Overview"],
     }),
+    getInspectionDetails: builder.query({
+      query: (id) => ({
+        url: "/overview/inspection/detail/",
+        params: { id },
+      }),
+      providesTags: ["Overview"],
+    }),
     getUserOverview: builder.query({
       query: () => "/overview/user/",
       providesTags: ["Overview"],
@@ -64,6 +71,7 @@ export const {
   useGetTenantByIdQuery,
   useGetPropertyByIdQuery,
   useGetInspectionOverviewQuery,
+  useGetInspectionDetailsQuery,
   useGetUserOverviewQuery,
   useGetVerificationsQuery,
   useGetVerificationDetailsQuery,

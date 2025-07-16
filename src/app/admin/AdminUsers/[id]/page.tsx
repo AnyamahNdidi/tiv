@@ -41,8 +41,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useGetAdminUserDetailQuery } from "@/lib/redux/api/adminUserApi";
+import {
+  useDeleteAdminUserMutation,
+  useGetAdminUserDetailQuery,
+  useListRolesQuery,
+  useUpdateAdminUserMutation,
+} from "@/lib/redux/api/adminUserApi";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface PageProps {
   params: { id: string };
@@ -134,6 +140,10 @@ const AdminUserDetails = ({ params }: PageProps) => {
   const router = useRouter();
   const { data: adminData, isLoading: isLoadingAdminData } =
     useGetAdminUserDetailQuery(params?.id);
+  const { data: roles } = useListRolesQuery({});
+  const [updateAdmin] = useUpdateAdminUserMutation();
+  const [deleteAdmin] = useDeleteAdminUserMutation();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   console.log("adminData", adminData);
   const [isLoading, setIsLoading] = useState(false);
@@ -157,17 +167,28 @@ const AdminUserDetails = ({ params }: PageProps) => {
   });
 
   const handleEditAdmin = () => {
-    console.log("Edit admin clicked");
+    setEditFormData({
+      first_name: adminData?.first_name,
+      last_name: adminData?.last_name,
+      email: adminData?.email,
+      admin_roles: adminData?.admin_roles,
+    });
     setIsEditModalOpen(true);
   };
 
-  const handleDeactivateAdmin = () => {
-    const confirmed = confirm(
-      "Are you sure you want to deactivate this admin?"
-    );
-    if (confirmed) {
-      console.log("Deactivating admin:", adminData.email);
-      alert("Admin would be deactivated");
+  const handleDeactivateAdmin = async () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteAdmin(adminData.id).unwrap();
+      toast.success("Admin deleted successfully!");
+      setIsDeleteModalOpen(false);
+      router.push("/admin/AdminUsers");
+    } catch (error) {
+      toast.error("Failed to delete admin");
+      console.error("Admin deletion error:", error);
     }
   };
 
@@ -180,15 +201,15 @@ const AdminUserDetails = ({ params }: PageProps) => {
     }, 1000);
   };
 
-  const handleManagePermissions = () => {
-    console.log("Managing permissions for admin:", adminData.id);
-    alert("Permission management modal would open here");
-  };
+  // const handleManagePermissions = () => {
+  //   console.log("Managing permissions for admin:", adminData.id);
+  //   alert("Permission management modal would open here");
+  // };
 
-  const handleUpdateRole = () => {
-    console.log("Updating role for admin:", adminData.id);
-    alert("Role update dialog would open here");
-  };
+  // const handleUpdateRole = () => {
+  //   console.log("Updating role for admin:", adminData.id);
+  //   alert("Role update dialog would open here");
+  // };
 
   const handleEditPermission = (section: string) => {
     const permission = adminData.role_permissions.find(
@@ -226,11 +247,18 @@ const AdminUserDetails = ({ params }: PageProps) => {
     }));
   };
 
-  const handleSaveAdmin = () => {
-    console.log("Saving admin data:", editFormData);
-    // Here you would typically make an API call to update the admin
-    setIsEditModalOpen(false);
-    alert("Admin details updated successfully!");
+  const handleSaveAdmin = async () => {
+    try {
+      await updateAdmin({
+        admin_id: adminData.id,
+        ...editFormData,
+      }).unwrap();
+      toast.success("Admin details updated successfully!");
+      setIsEditModalOpen(false);
+    } catch (error) {
+      toast.error("Failed to update admin details");
+      console.error("Admin update error:", error);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -286,7 +314,7 @@ const AdminUserDetails = ({ params }: PageProps) => {
             </Button>
             <Button variant="destructive" onClick={handleDeactivateAdmin}>
               <UserX className="w-4 h-4 mr-2" />
-              Deactivate
+              Delete
             </Button>
           </div>
         </div>
@@ -371,7 +399,7 @@ const AdminUserDetails = ({ params }: PageProps) => {
         </Card>
 
         {/* Admin Actions */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Admin Actions</CardTitle>
           </CardHeader>
@@ -401,7 +429,7 @@ const AdminUserDetails = ({ params }: PageProps) => {
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Permissions Table */}
         <Card>
@@ -484,7 +512,7 @@ const AdminUserDetails = ({ params }: PageProps) => {
                                   handleEditPermission(permission.section)
                                 }
                               >
-                                Edit
+                                view
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -568,11 +596,11 @@ const AdminUserDetails = ({ params }: PageProps) => {
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Sudo">Sudo</SelectItem>
-                    <SelectItem value="Super">Super</SelectItem>
-                    <SelectItem value="Developer">Developer</SelectItem>
-                    <SelectItem value="Manager">Manager</SelectItem>
-                    <SelectItem value="Support">Support</SelectItem>
+                    {roles?.map((role: any) => (
+                      <SelectItem key={role.id} value={role.role}>
+                        {role.role}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -736,7 +764,7 @@ const AdminUserDetails = ({ params }: PageProps) => {
                 </div>
               </div>
             </div>
-            <DialogFooter>
+            {/* <DialogFooter>
               <Button
                 variant="outline"
                 onClick={() => setIsPermissionModalOpen(false)}
@@ -744,7 +772,29 @@ const AdminUserDetails = ({ params }: PageProps) => {
                 Cancel
               </Button>
               <Button onClick={handleSavePermission}>Save Permissions</Button>
-            </DialogFooter>
+            </DialogFooter> */}
+          </DialogContent>
+        </Dialog>
+        <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Delete Admin</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this admin? This action cannot
+                be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleConfirmDelete}>
+                Delete Admin
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Icon } from "@iconify/react";
-import { useCreateAdminMutation } from "@/lib/redux/api/adminUserApi";
+import {
+  useCreateAdminMutation,
+  useListRolesQuery,
+} from "@/lib/redux/api/adminUserApi";
 import { toast } from "sonner";
 
 interface CreateAdminModalProps {
@@ -17,8 +20,11 @@ const CreateAdminModal: React.FC<CreateAdminModalProps> = ({ onClose }) => {
 
   const [createAdmin, { isLoading }] = useCreateAdminMutation();
 
+  const { data: roles, isLoading: rolesLoading } = useListRolesQuery({});
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const { first_name, last_name, email, role } = formData;
+    console.log(formData);
     try {
       await createAdmin(formData).unwrap();
       toast.success("Admin user created successfully");
@@ -106,11 +112,14 @@ const CreateAdminModal: React.FC<CreateAdminModalProps> = ({ onClose }) => {
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               required
+              disabled={rolesLoading}
             >
               <option value="">Select Role</option>
-              <option value="Developer">Developer</option>
-              <option value="Super">Super</option>
-              <option value="Sudo">Sudo</option>
+              {roles?.map((role: any) => (
+                <option key={role.id} value={role.role}>
+                  {role.role}
+                </option>
+              ))}
             </select>
           </div>
 

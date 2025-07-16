@@ -44,7 +44,9 @@ const AdminLogin = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingLogin, setIsLoadingLogin] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { loading, error } = useSelector(
+    (state: RootState) => state.auth as any
+  );
   const [showPassword, setShowPassword] = useState(false);
   const [showFirstLoginModal, setShowFirstLoginModal] = useState(false);
 

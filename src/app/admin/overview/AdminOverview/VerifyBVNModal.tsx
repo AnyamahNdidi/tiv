@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { Icon } from "@iconify/react";
+import { useVerifyBVNMutation } from "@/lib/redux/api/authorizationApi";
+import { toast } from "sonner";
 
 interface VerifyBVNModalProps {
   onClose: () => void;
@@ -7,11 +9,22 @@ interface VerifyBVNModalProps {
 }
 
 const VerifyBVNModal: React.FC<VerifyBVNModalProps> = ({ onClose, userId }) => {
-  const [bvnNumber, setBvnNumber] = useState("");
+  const [verifyBVN, { isLoading }] = useVerifyBVNMutation();
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose();
+    }
+  };
+
+  const handleVerifyBVN = async () => {
+    try {
+      await verifyBVN(userId).unwrap();
+      toast.success("BVN verified successfully");
+      onClose();
+    } catch (error) {
+      toast.error("Failed to verify BVN");
+      console.error("BVN verification error:", error);
     }
   };
 
@@ -32,19 +45,10 @@ const VerifyBVNModal: React.FC<VerifyBVNModalProps> = ({ onClose, userId }) => {
         </div>
 
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              BVN Number
-            </label>
-            <input
-              type="text"
-              value={bvnNumber}
-              onChange={(e) => setBvnNumber(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="Enter BVN number"
-              required
-            />
-          </div>
+          <p className="text-gray-600">
+            Are you sure you want to verify this user's BVN? This action cannot
+            be undone.
+          </p>
 
           <div className="flex justify-end gap-3 mt-6">
             <button
@@ -54,13 +58,11 @@ const VerifyBVNModal: React.FC<VerifyBVNModalProps> = ({ onClose, userId }) => {
               Cancel
             </button>
             <button
-              onClick={() => {
-                // Add BVN verification logic here
-                onClose();
-              }}
+              onClick={handleVerifyBVN}
+              disabled={isLoading}
               className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
             >
-              Verify BVN
+              {isLoading ? "Verifying..." : "Verify BVN"}
             </button>
           </div>
         </div>

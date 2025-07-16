@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { Icon } from "@iconify/react";
+import { useBlockUserMutation } from "@/lib/redux/api/authorizationApi";
+import { toast } from "sonner";
 
 interface BlockUserModalProps {
   onClose: () => void;
@@ -7,11 +9,22 @@ interface BlockUserModalProps {
 }
 
 const BlockUserModal: React.FC<BlockUserModalProps> = ({ onClose, userId }) => {
-  const [reason, setReason] = useState("");
+  const [blockUser, { isLoading }] = useBlockUserMutation();
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose();
+    }
+  };
+
+  const handleBlockUser = async () => {
+    try {
+      await blockUser(userId).unwrap();
+      toast.success("User blocked successfully");
+      onClose();
+    } catch (error) {
+      toast.error("Failed to block user");
+      console.error("Block user error:", error);
     }
   };
 
@@ -32,18 +45,10 @@ const BlockUserModal: React.FC<BlockUserModalProps> = ({ onClose, userId }) => {
         </div>
 
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Reason for Blocking
-            </label>
-            <textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md h-32 resize-none"
-              placeholder="Enter reason for blocking user"
-              required
-            />
-          </div>
+          <p className="text-gray-600">
+            Are you sure you want to block this user? This action can be
+            reversed later.
+          </p>
 
           <div className="flex justify-end gap-3 mt-6">
             <button
@@ -53,13 +58,11 @@ const BlockUserModal: React.FC<BlockUserModalProps> = ({ onClose, userId }) => {
               Cancel
             </button>
             <button
-              onClick={() => {
-                // Add block user logic here
-                onClose();
-              }}
+              onClick={handleBlockUser}
+              disabled={isLoading}
               className="px-4 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 flex items-center gap-2"
             >
-              Block User
+              {isLoading ? "Blocking..." : "Block User"}
             </button>
           </div>
         </div>

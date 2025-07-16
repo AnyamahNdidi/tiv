@@ -27,6 +27,10 @@ export const financeApi = createApi({
       query: () => "/finance/revenue/dump/",
       providesTags: ["Finance"],
     }),
+    getAllCoupons: builder.query({
+      query: () => "/get/coupon/all/",
+      providesTags: ["Finance"],
+    }),
     createCoupon: builder.mutation({
       query: (couponData) => ({
         url: "/create/coupon/",
@@ -36,7 +40,10 @@ export const financeApi = createApi({
       invalidatesTags: ["Finance"],
     }),
     confirmCouponCode: builder.query({
-      query: (code) => `/confirm/coupon/code/${code}`,
+      query: (code) => ({
+        url: `/confirm/coupon/code/`,
+        params: { coupon_code: code },
+      }),
       providesTags: ["Finance"],
     }),
   }),
@@ -47,4 +54,5 @@ export const {
   useGetFinanceRevenueDumpQuery,
   useCreateCouponMutation,
   useConfirmCouponCodeQuery,
+  useGetAllCouponsQuery,
 } = financeApi;

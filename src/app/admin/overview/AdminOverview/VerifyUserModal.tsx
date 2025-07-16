@@ -1,5 +1,7 @@
 import React from "react";
 import { Icon } from "@iconify/react";
+import { useVerifyUserMutation } from "@/lib/redux/api/authorizationApi";
+import { toast } from "sonner";
 
 interface VerifyUserModalProps {
   onClose: () => void;
@@ -10,9 +12,22 @@ const VerifyUserModal: React.FC<VerifyUserModalProps> = ({
   onClose,
   userId,
 }) => {
+  console.log("userId", userId);
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose();
+    }
+  };
+  const [verifyUser, { isLoading }] = useVerifyUserMutation();
+
+  const handleVerify = async () => {
+    try {
+      await verifyUser(userId).unwrap();
+      toast.success("User verified successfully");
+      onClose();
+    } catch (error) {
+      toast.error("Failed to verify user");
+      console.error("Verification error:", error);
     }
   };
 
@@ -48,11 +63,13 @@ const VerifyUserModal: React.FC<VerifyUserModalProps> = ({
             <button
               onClick={() => {
                 // Add verification logic here
+                handleVerify();
                 onClose();
               }}
+              disabled={isLoading}
               className="px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center gap-2"
             >
-              Verify User
+              {isLoading ? "Verifying..." : "Verify"}
             </button>
           </div>
         </div>
