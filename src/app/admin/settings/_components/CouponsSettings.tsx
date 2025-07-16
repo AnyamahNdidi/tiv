@@ -412,7 +412,7 @@ export default function CouponsSettings() {
                     <TableHead>Type</TableHead>
                     <TableHead>Expiry Date</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
+                    {/* <TableHead>Actions</TableHead> */}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -473,11 +473,6 @@ export default function CouponsSettings() {
                             ? "Expired"
                             : "Active"}
                         </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm">
-                          Edit
-                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
