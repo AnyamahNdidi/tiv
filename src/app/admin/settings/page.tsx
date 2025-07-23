@@ -32,6 +32,7 @@ import CouponsSettings from "./_components/CouponsSettings";
 import { PermissionSettings } from "./_components/PermissionSettings";
 import UserSeetings from "./_components/UserSeetings";
 import Subscriptions from "./_components/Subscriptions";
+import PricingSettings from "./_components/PricingSettings";
 
 export default function AdminSettingsPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -231,73 +232,7 @@ export default function AdminSettingsPage() {
 
           {/* Pricing Tab */}
           <TabsContent value="pricing" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Update Pricing</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="serviceAmount">Service Charge Amount</Label>
-                    <Input
-                      id="serviceAmount"
-                      placeholder="0.00"
-                      type="number"
-                      step="0.01"
-                      value={pricingData.serviceCharge}
-                      onChange={(e) =>
-                        setPricingData({
-                          ...pricingData,
-                          serviceCharge: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bonusAmount">Bonus Charge Amount</Label>
-                    <Input
-                      id="bonusAmount"
-                      placeholder="0.00"
-                      type="number"
-                      step="0.01"
-                      value={pricingData.bonusCharge}
-                      onChange={(e) =>
-                        setPricingData({
-                          ...pricingData,
-                          bonusCharge: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="inspectionAmount">
-                      Inspection Charge Amount
-                    </Label>
-                    <Input
-                      id="inspectionAmount"
-                      placeholder="0.00"
-                      type="number"
-                      step="0.01"
-                      value={pricingData.inspectionCharge}
-                      onChange={(e) =>
-                        setPricingData({
-                          ...pricingData,
-                          inspectionCharge: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-                <Button
-                  onClick={handleUpdatePricing}
-                  disabled={isLoading}
-                  className="w-full bg-orange-500 hover:bg-orange-600"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  {isLoading ? "Updating..." : "Update Pricing"}
-                </Button>
-              </CardContent>
-            </Card>
+            <PricingSettings />
           </TabsContent>
 
           {/* Subscriptions Tab */}

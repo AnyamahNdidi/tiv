@@ -46,6 +46,30 @@ export const financeApi = createApi({
       }),
       providesTags: ["Finance"],
     }),
+    updateServiceCharge: builder.mutation({
+      query: (chargeData) => ({
+        url: "/service/charge/",
+        method: "PUT",
+        body: chargeData,
+      }),
+      invalidatesTags: ["Finance"],
+    }),
+    updateBonusCharge: builder.mutation({
+      query: (bonusData) => ({
+        url: "/bonus/charge/",
+        method: "PUT",
+        body: bonusData,
+      }),
+      invalidatesTags: ["Finance"],
+    }),
+    updateInspectionCharge: builder.mutation({
+      query: (inspectionData) => ({
+        url: "/inspection/charge/",
+        method: "PUT",
+        body: inspectionData,
+      }),
+      invalidatesTags: ["Finance"],
+    }),
   }),
 });
 
@@ -55,4 +79,7 @@ export const {
   useCreateCouponMutation,
   useConfirmCouponCodeQuery,
   useGetAllCouponsQuery,
+  useUpdateServiceChargeMutation,
+  useUpdateBonusChargeMutation,
+  useUpdateInspectionChargeMutation,
 } = financeApi;
