@@ -11,43 +11,79 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import React, { useState } from "react";
+import { useGetUserOverviewQuery } from "@/lib/redux/api/overviewApi";
+import { toast } from "sonner";
+import {
+  useBlockUserMutation,
+  useVerifyBVNMutation,
+  useVerifyUserMutation,
+} from "@/lib/redux/api/authorizationApi";
 
 const UserSeetings = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const { data: userOverviewData, isLoading: isLoadingUsers } =
+    useGetUserOverviewQuery();
   const [userManagement, setUserManagement] = useState({
     userId: "",
     blockReason: "",
     verificationNotes: "",
   });
+  const [blockUser] = useBlockUserMutation();
+  const [verifyUser] = useVerifyUserMutation();
+  const [verifyBVN] = useVerifyBVNMutation();
 
   const handleBlockUser = async () => {
-    setIsLoading(true);
-    console.log("Blocking user:", userManagement.userId);
-    // API call to /admin/api/v1/block/{user_id}/
-    setTimeout(() => {
+    if (!userManagement.userId) {
+      toast.error("Please select a user first");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await blockUser(userManagement.userId);
+      toast.success("User blocked successfully!");
+    } catch (error) {
+      toast.error("Failed to block user");
+      console.error("Failed to block user:", error);
+    } finally {
       setIsLoading(false);
-      alert("User blocked successfully!");
-    }, 1000);
+    }
   };
 
   const handleVerifyUser = async () => {
-    setIsLoading(true);
-    console.log("Verifying user:", userManagement.userId);
-    // API call to /admin/api/v1/verify_user/{user_id}/
-    setTimeout(() => {
+    if (!userManagement.userId) {
+      toast.error("Please select a user first");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await verifyUser(userManagement.userId);
+      toast.success("User verified successfully!");
+    } catch (error) {
+      toast.error("Failed to verify user");
+      console.error("Failed to verify user:", error);
+    } finally {
       setIsLoading(false);
-      alert("User verified successfully!");
-    }, 1000);
+    }
   };
 
   const handleBvnVerify = async () => {
-    setIsLoading(true);
-    console.log("BVN verifying user:", userManagement.userId);
-    // API call to /admin/api/v1/bvn_verified/{user_id}/
-    setTimeout(() => {
+    if (!userManagement.userId) {
+      toast.error("Please select a user first");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await verifyBVN(userManagement.userId);
+      toast.success("BVN verification completed!");
+    } catch (error) {
+      toast.error("Failed to verify BVN");
+      console.error("Failed to verify BVN:", error);
+    } finally {
       setIsLoading(false);
-      alert("BVN verification completed!");
-    }, 1000);
+    }
   };
   return (
     <div>
@@ -64,16 +100,17 @@ const UserSeetings = () => {
                 onValueChange={(value) =>
                   setUserManagement({ ...userManagement, userId: value })
                 }
+                disabled={isLoadingUsers}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a user" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">John Doe (ID: 1)</SelectItem>
-                  <SelectItem value="2">Jane Smith (ID: 2)</SelectItem>
-                  <SelectItem value="3">Mike Johnson (ID: 3)</SelectItem>
-                  <SelectItem value="4">Sarah Wilson (ID: 4)</SelectItem>
-                  <SelectItem value="5">David Brown (ID: 5)</SelectItem>
+                  {userOverviewData?.users.data.map((user) => (
+                    <SelectItem key={user.id} value={user.id.toString()}>
+                      {user.full_name} ({user.email})
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
