@@ -16,13 +16,13 @@ const PricingSettings = () => {
 
   const [pricingData, setPricingData] = useState<any>({
     serviceCharge: {
-      amount: 0,
+      amount: "",
     },
     bonusCharge: {
-      amount: 0,
+      amount: "",
     },
     inspectionCharge: {
-      amount: 0,
+      amount: "",
     },
   });
 
@@ -118,7 +118,7 @@ const PricingSettings = () => {
               <Input
                 id="serviceAmount"
                 placeholder="0.00"
-                type="number"
+                type="text"
                 step="0.01"
                 min="0"
                 value={pricingData.serviceCharge.amount}
@@ -138,7 +138,7 @@ const PricingSettings = () => {
               <Input
                 id="bonusAmount"
                 placeholder="0.00"
-                type="number"
+                type="text"
                 step="0.01"
                 min="0"
                 value={pricingData.bonusCharge.amount}
@@ -158,7 +158,7 @@ const PricingSettings = () => {
               <Input
                 id="inspectionAmount"
                 placeholder="0.00"
-                type="number"
+                type="text"
                 step="0.01"
                 min="0"
                 value={pricingData.inspectionCharge.amount}
