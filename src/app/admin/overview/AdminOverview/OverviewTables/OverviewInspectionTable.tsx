@@ -22,11 +22,22 @@ interface InspectionTableProps {
     }>;
   };
   onViewDetails: (id: number) => void;
+  filters: {
+    search: string;
+    date_from: string;
+    date_to: string;
+    page: number;
+    page_size: number;
+    search_by_day: number;
+  };
+  setFilters: React.Dispatch<React.SetStateAction<any>>;
 }
 
 export default function OverviewInspectionTable({
   inspections,
   onViewDetails,
+  filters,
+  setFilters,
 }: InspectionTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,6 +59,29 @@ export default function OverviewInspectionTable({
     currentPage * itemsPerPage
   );
 
+  const handleSearch = (value: string) => {
+    setFilters((prev: any) => ({
+      ...prev,
+      search: value,
+      page: 1,
+    }));
+  };
+
+  const handlePageChange = (page: number) => {
+    setFilters((prev: any) => ({
+      ...prev,
+      page,
+    }));
+  };
+
+  const handleItemsPerPageChange = (pageSize: number) => {
+    setFilters((prev: any) => ({
+      ...prev,
+      page_size: pageSize,
+      page: 1,
+    }));
+  };
+
   return (
     <div className="p-3 md:px-10 lg:px-10 w-full overflow-x-auto">
       {/* Search Header */}
@@ -64,11 +98,8 @@ export default function OverviewInspectionTable({
           <input
             type="text"
             placeholder="Search Requests"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1); // reset to first page on search
-            }}
+            value={filters.search}
+            onChange={(e) => handleSearch(e.target.value)}
             className="pl-10 pr-4 py-2 w-full shadow text-gray-500 rounded-lg bg-white"
           />
         </div>
@@ -126,16 +157,15 @@ export default function OverviewInspectionTable({
         </div>
 
         {/* Pagination */}
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={totalPages}
-          setCurrentPage={setCurrentPage}
-          itemsPerPage={itemsPerPage}
-          setItemsPerPage={(value) => {
-            setItemsPerPage(value);
-            setCurrentPage(1); // Reset page on change
-          }}
-        />
+        {inspections.data.length > 0 && (
+          <PaginationControls
+            currentPage={filters.page}
+            totalPages={Math.ceil(inspections.total_count / filters.page_size)}
+            setCurrentPage={handlePageChange}
+            itemsPerPage={filters.page_size}
+            setItemsPerPage={handleItemsPerPageChange}
+          />
+        )}
       </div>
     </div>
   );

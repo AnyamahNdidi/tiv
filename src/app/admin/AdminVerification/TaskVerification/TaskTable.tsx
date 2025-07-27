@@ -28,6 +28,18 @@ interface TaskTableProps {
       created_at: string;
     }>;
   };
+  filters: {
+    search: string;
+    page: number;
+    page_size: number;
+  };
+  setFilters: React.Dispatch<
+    React.SetStateAction<{
+      search: string;
+      page: number;
+      page_size: number;
+    }>
+  >;
 }
 
 const ITEMS_PER_PAGE = 6;
@@ -36,10 +48,13 @@ export default function RequestTable({
   selectedTask,
   setSelectedTask,
   verificationData,
+  filters,
+  setFilters,
 }: TaskTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(ITEMS_PER_PAGE);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
   const summary = {
     totalRequest: verificationData?.pagination?.total_count || 0,
@@ -58,12 +73,38 @@ export default function RequestTable({
         task.email.toLowerCase().includes(searchQuery.toLowerCase())
     ) || [];
 
-  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+  // const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
 
   const paginatedRequests = filteredRequests.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const handleSearch = (value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      search: value,
+      page: 1,
+    }));
+  };
+
+  const handleItemsPerPageChange = (value: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page_size: value,
+      page: 1,
+    }));
+  };
+  const totalPages = Math.ceil(
+    (verificationData?.pagination?.total_count || 0) / filters.page_size
+  );
+
+  const handlePageChange = (newPage: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page: newPage,
+    }));
+  };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
@@ -72,6 +113,7 @@ export default function RequestTable({
   const handlePrevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
+  const tableData = verificationData?.data || [];
 
   return (
     <div className="w-full max-w-screen overflow-x-hidden">
@@ -117,12 +159,12 @@ export default function RequestTable({
                     type="text"
                     placeholder="Search by ID, name or email"
                     className="pl-10 pr-4 py-2 w-full text-sm text-gray-500 rounded-lg bg-white border border-gray-200"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={filters.search}
+                    onChange={(e) => handleSearch(e.target.value)}
                   />
                 </div>
 
-                <div className="flex p-3 gap-2 bg-white rounded-xl justify-center items-center cursor-pointer w-fit">
+                {/* <div className="flex p-3 gap-2 bg-white rounded-xl justify-center items-center cursor-pointer w-fit">
                   <Icon
                     icon="icon-park-outline:filter"
                     width="16"
@@ -130,7 +172,7 @@ export default function RequestTable({
                     className="text-gray-400"
                   />
                   <p className="text-sm">Filters</p>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -151,41 +193,66 @@ export default function RequestTable({
                     </tr>
                   </thead>
                   <tbody>
-                    {paginatedRequests.map((task) => (
-                      <tr
-                        key={task.id}
-                        className="border-t border-gray-100 text-sm"
-                      >
-                        <td className="py-3 px-4">#{task.uuid.slice(0, 8)}</td>
-                        <td className="py-3 px-4 flex items-center gap-6">
-                          <span className="w-8 h-8 flex items-center justify-center bg-red-100 text-red-600 rounded-full font-semibold">
-                            {task.landlord_name.charAt(0)}
-                          </span>
-                          {task.landlord_name}
-                        </td>
-                        <td className="py-3 px-4">{task.full_name}</td>
-                        <td className="py-3 px-4">{task.email}</td>
-                        <td className="py-3 px-4">{task.phone}</td>
-                        <td className="py-3 px-4">
-                          {new Date(task.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="py-3 px-4">
-                          <StatusBadge status={task.status} />
-                        </td>
-                        <td
-                          className="py-3 px-4 cursor-pointer"
-                          onClick={() => setSelectedTask(task)}
-                        >
-                          <StatusBadge status="View" />
+                    {tableData?.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="py-8 text-center">
+                          <div className="flex flex-col items-center justify-center gap-2">
+                            <Icon
+                              icon="mingcute:search-3-line"
+                              className="w-12 h-12 text-gray-400"
+                            />
+                            <p className="text-gray-500 text-lg">
+                              {filters.search
+                                ? "No results found for your search"
+                                : "No tasks available"}
+                            </p>
+                            <p className="text-gray-400 text-sm">
+                              {filters.search
+                                ? "Try adjusting your search criteria"
+                                : "Check back later for new tasks"}
+                            </p>
+                          </div>
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      tableData?.map((task) => (
+                        <tr
+                          key={task.id}
+                          className="border-t border-gray-100 text-sm"
+                        >
+                          <td className="py-3 px-4">
+                            #{task.uuid.slice(0, 8)}
+                          </td>
+                          <td className="py-3 px-4 flex items-center gap-6">
+                            <span className="w-8 h-8 flex items-center justify-center bg-red-100 text-red-600 rounded-full font-semibold">
+                              {task.landlord_name.charAt(0)}
+                            </span>
+                            {task.landlord_name}
+                          </td>
+                          <td className="py-3 px-4">{task.full_name}</td>
+                          <td className="py-3 px-4">{task.email}</td>
+                          <td className="py-3 px-4">{task.phone}</td>
+                          <td className="py-3 px-4">
+                            {new Date(task.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="py-3 px-4">
+                            <StatusBadge status={task.status} />
+                          </td>
+                          <td
+                            className="py-3 px-4 cursor-pointer"
+                            onClick={() => setSelectedTask(task)}
+                          >
+                            <StatusBadge status="View" />
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
 
               {/* Pagination */}
-              <div className="flex flex-wrap justify-between items-center mt-4 mb-4 text-gray-600 text-sm">
+              {/* <div className="flex flex-wrap justify-between items-center mt-4 mb-4 text-gray-600 text-sm">
                 <div className="flex items-center gap-4">
                   <select
                     value={itemsPerPage}
@@ -215,6 +282,51 @@ export default function RequestTable({
                     disabled={currentPage === totalPages}
                     className={`hover:bg-red-100 p-2 rounded-md ${
                       currentPage === totalPages
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
+                  >
+                    <Icon icon="akar-icons:chevron-right" />
+                  </button>
+                </div>
+              </div> */}
+              <div className="flex flex-wrap justify-between items-center mt-4 mb-4 text-gray-600 text-sm">
+                <div className="flex items-center gap-4">
+                  <select
+                    value={filters.page_size}
+                    onChange={(e) =>
+                      handleItemsPerPageChange(Number(e.target.value))
+                    }
+                    className="border border-gray-100 p-2 rounded-md w-14 h-9"
+                  >
+                    <option value={6}>6</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                  </select>
+                  per page
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      handlePageChange(Math.max(1, filters.page - 1))
+                    }
+                    disabled={filters.page === 1}
+                    className={`hover:bg-red-100 p-2 rounded-md ${
+                      filters.page === 1 ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    <Icon icon="akar-icons:chevron-left" />
+                  </button>
+                  <span className="bg-red-100 text-red-600 px-3 py-1 rounded-md">
+                    {filters.page}
+                  </span>
+                  <button
+                    onClick={() =>
+                      handlePageChange(Math.min(totalPages, filters.page + 1))
+                    }
+                    disabled={filters.page === totalPages}
+                    className={`hover:bg-red-100 p-2 rounded-md ${
+                      filters.page === totalPages
                         ? "opacity-50 cursor-not-allowed"
                         : ""
                     }`}

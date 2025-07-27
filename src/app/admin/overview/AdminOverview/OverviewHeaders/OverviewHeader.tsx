@@ -44,6 +44,21 @@ const TABS = {
 };
 
 const OverviewHeader = () => {
+  const [filters, setFilters] = useState(() => {
+    const today = new Date();
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    return {
+      search: "",
+      date_from: sevenDaysAgo.toISOString().split("T")[0],
+      date_to: today.toISOString().split("T")[0],
+      page: 1,
+      page_size: 6,
+      search_by_day: 0,
+    };
+  });
+
   const [activeTab, setActiveTab] = useState<string>(TABS.REVENUE);
   const [, setStartDate] = useState("");
   const [, setEndDate] = useState("");
@@ -56,7 +71,7 @@ const OverviewHeader = () => {
     null
   );
   const { data: inspectionData, isLoading: inspectionLoading } =
-    useGetInspectionOverviewQuery({});
+    useGetInspectionOverviewQuery(filters);
   const { data: userOverView, isLoading: userLoading } =
     useGetUserOverviewQuery({});
 
@@ -78,6 +93,15 @@ const OverviewHeader = () => {
     useGetInspectionDetailsQuery(selectedInspectionId, {
       skip: !selectedInspectionId,
     });
+
+  const handleDateChange = (start: string, end: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      date_from: start,
+      date_to: end,
+      page: 1, // Reset to first page when dates change
+    }));
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -163,6 +187,8 @@ const OverviewHeader = () => {
               onViewDetails={(inspectionId) =>
                 setSelectedInspectionId(inspectionId)
               }
+              filters={filters}
+              setFilters={setFilters}
             />
           </>
         );
@@ -200,7 +226,8 @@ const OverviewHeader = () => {
 
   const showHeader = !(
     (activeTab === TABS.TENANT && (selectedTenant || selectedProperty)) ||
-    (activeTab === TABS.USERS && selectedUserId)
+    (activeTab === TABS.USERS && selectedUserId) ||
+    (activeTab === TABS.INSPECTION && selectedInspectionId)
   );
 
   return (

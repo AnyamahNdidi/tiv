@@ -36,7 +36,17 @@ export const overviewApi = createApi({
       providesTags: ["Overview"],
     }),
     getInspectionOverview: builder.query({
-      query: () => "/overview/inspection/",
+      query: (params) => ({
+        url: "/overview/inspection/",
+        params: {
+          search: params?.search || "",
+          date_from: params?.date_from || "",
+          date_to: params?.date_to || "",
+          page: params?.page || 1,
+          page_size: params?.page_size || 6,
+          search_by_day: params?.search_by_day,
+        },
+      }),
       providesTags: ["Overview"],
     }),
     getInspectionDetails: builder.query({

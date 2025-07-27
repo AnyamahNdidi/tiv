@@ -4,6 +4,6 @@ export const verificationColumns = [
   { label: "Full name", key: "full_name" },
   { label: "Email", key: "email" },
   { label: "Date", key: "date" },
-  { label: "Address", key: "address" },
+  // { label: "Address", key: "address" },
   { label: "Statue", key: "status" },
 ];

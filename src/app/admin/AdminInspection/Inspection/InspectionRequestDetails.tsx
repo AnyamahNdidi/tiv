@@ -21,10 +21,10 @@ const InspectionRequestDetails: React.FC<InspectionDetailsProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updateStatus, { isLoading }] = useUpdateInspectionStatusMutation();
   const [activeStatus, setActiveStatus] = useState<
-    "completed" | "allowed" | null
+    "completed" | "refound" | null
   >(null);
 
-  const handleStatusUpdate = async (status: "completed" | "allowed") => {
+  const handleStatusUpdate = async (status: "completed" | "refound") => {
     setActiveStatus(status);
     const toastId = toast.loading(`Updating status to ${status}...`);
 
@@ -126,14 +126,14 @@ const InspectionRequestDetails: React.FC<InspectionDetailsProps> = ({
 
             <button
               className={`text-xs sm:text-sm border text-white px-3 py-1.5 rounded-md whitespace-nowrap flex items-center justify-center gap-2 ${
-                activeStatus === "allowed" && isLoading
-                  ? "bg-blue-700"
-                  : "bg-blue-600 hover:bg-blue-700"
+                activeStatus === "refound" && isLoading
+                  ? "bg-red-600"
+                  : "bg-red-600 hover:bg-red-600"
               }`}
-              onClick={() => handleStatusUpdate("allowed")}
-              disabled={isLoading && activeStatus === "allowed"}
+              onClick={() => handleStatusUpdate("refound")}
+              disabled={isLoading && activeStatus === "refound"}
             >
-              {activeStatus === "allowed" && isLoading ? (
+              {activeStatus === "refound" && isLoading ? (
                 <>
                   <svg
                     className="animate-spin h-4 w-4 text-white"
@@ -158,7 +158,7 @@ const InspectionRequestDetails: React.FC<InspectionDetailsProps> = ({
                   Processing...
                 </>
               ) : (
-                "Mark as Allowed"
+                "Refound"
               )}
             </button>
             {/* <button

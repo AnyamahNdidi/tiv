@@ -41,6 +41,15 @@ export const authorizationApi = createApi({
       }),
       invalidatesTags: ["Authorization"],
     }),
+    unblockUser: builder.mutation({
+      query: (user_id) => ({
+        url: `/block/${user_id}/`,
+        method: "POST",
+        body: { blocked: false },
+      }),
+      invalidatesTags: ["Authorization"],
+    }),
+
     listSections: builder.query({
       query: () => ({
         url: "/list/section/",
@@ -66,4 +75,5 @@ export const {
   useBlockUserMutation,
   useListSectionsQuery,
   useAssignPermissionsMutation,
+  useUnblockUserMutation,
 } = authorizationApi;

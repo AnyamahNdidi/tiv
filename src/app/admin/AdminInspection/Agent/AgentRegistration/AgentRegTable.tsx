@@ -11,11 +11,33 @@ interface AgentRegTableProps {
     registration: AgentDetailedInfo | null
   ) => void;
   agents: AgentDetailedInfo[];
+  filters: {
+    search: string;
+    date_from: string;
+    date_to: string;
+    page: number;
+    page_size: number;
+    search_by_day: number;
+  };
+  setFilters: React.Dispatch<
+    React.SetStateAction<{
+      search: string;
+      date_from: string;
+      date_to: string;
+      page: number;
+      page_size: number;
+      search_by_day: number;
+    }>
+  >;
+  totalPages: number;
 }
 
 const AgentRegTable: React.FC<AgentRegTableProps> = ({
   setselectedRegistrationRequest,
   agents,
+  filters,
+  setFilters,
+  totalPages,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
@@ -45,10 +67,78 @@ const AgentRegTable: React.FC<AgentRegTableProps> = ({
 
   console.log("paginatedTransactions", paginatedTransactions);
 
-  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  // const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
 
   const handleRegistrationDetails = (registration: AgentDetailedInfo) => {
     setselectedRegistrationRequest(registration);
+  };
+  const handleSearch = (value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      search: value,
+      page: 1,
+    }));
+  };
+
+  const handlePageChange = (page: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page,
+    }));
+  };
+
+  const handleItemsPerPageChange = (pageSize: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page_size: pageSize,
+      page: 1,
+    }));
+  };
+
+  const renderTableContent = () => {
+    if (agents.length === 0) {
+      return (
+        <tr>
+          <td colSpan={7} className="text-center py-8">
+            <div className="flex flex-col items-center justify-center gap-2">
+              <Icon icon="carbon:no-data" className="w-12 h-12 text-gray-400" />
+              <p className="text-gray-500">
+                {filters.search
+                  ? `No results found for "${filters.search}"`
+                  : "No registration data available"}
+              </p>
+            </div>
+          </td>
+        </tr>
+      );
+    }
+
+    return agents.map((registration, index) => (
+      <tr
+        key={registration.account_id}
+        className="border-t border-gray-100 text-sm"
+      >
+        <td className="py-3 px-4">
+          <input
+            type="checkbox"
+            className="w-5 h-5 ring-1 ring-gray-200 appearance-none rounded-md text-blue-500"
+          />
+        </td>
+        <td className="py-5 px-4">#{registration.account_id}</td>
+        <td className="py-3 px-4">{registration.tenant_name}</td>
+        <td className="py-3 px-4">{registration.email}</td>
+        <td className="py-3 px-4">{registration.date_requested}</td>
+        <td className="py-3 px-4">
+          <StatusBadge status={registration.status} />
+        </td>
+        <td
+          className="py-3 px-4 font-medium text-gray-700 cursor-pointer"
+          onClick={() => handleRegistrationDetails(registration)}
+        >
+          <StatusBadge status="View" />
+        </td>
+      </tr>
+    ));
   };
 
   return (
@@ -62,13 +152,10 @@ const AgentRegTable: React.FC<AgentRegTableProps> = ({
           />
           <input
             type="text"
-            placeholder="Search by name"
+            placeholder="Search by name, email or ID"
             className="pl-10 pr-4 py-2 w-full text-gray-500 rounded-lg bg-white"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1); // Reset to first page on new search
-            }}
+            value={filters.search}
+            onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
       </div>
@@ -96,43 +183,25 @@ const AgentRegTable: React.FC<AgentRegTableProps> = ({
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {paginatedTransactions.map((registration, index) => (
-                <tr key={index} className="border-t border-gray-100 text-sm">
-                  <td className="py-3 px-4">
-                    <input
-                      type="checkbox"
-                      className="w-5 h-5 ring-1 ring-gray-200 appearance-none rounded-md text-blue-500"
-                    />
-                  </td>
-                  <td className="py-5 px-4">#{registration.account_id}</td>
-                  <td className="py-3 px-4">{registration.tenant_name}</td>
-                  <td className="py-3 px-4">{registration.email}</td>
-                  <td className="py-3 px-4">{registration.date_requested}</td>
-                  {/* <td className="py-3 px-4">{registration.status}</td> */}
-                  <td className="py-3 px-4">
-                    <StatusBadge status={registration.status} />
-                  </td>
-                  <td
-                    className="py-3 px-4 font-medium text-gray-700 cursor-pointer"
-                    onClick={() => handleRegistrationDetails(registration)}
-                  >
-                    <StatusBadge status="View" />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+            <tbody>{renderTableContent()}</tbody>
           </table>
         </div>
 
         {/* ✅ Pagination Controls Component */}
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={totalPages}
-          setCurrentPage={setCurrentPage}
-          itemsPerPage={itemsPerPage}
-          setItemsPerPage={setItemsPerPage}
-        />
+        {agents.length > 0 && (
+          <div className="mt-4 flex items-center justify-between px-4">
+            <div className="text-sm text-gray-500">
+              Showing {agents.length} results
+            </div>
+            <PaginationControls
+              currentPage={filters.page}
+              totalPages={totalPages}
+              setCurrentPage={handlePageChange}
+              itemsPerPage={filters.page_size}
+              setItemsPerPage={handleItemsPerPageChange}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

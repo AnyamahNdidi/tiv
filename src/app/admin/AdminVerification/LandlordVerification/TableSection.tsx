@@ -93,14 +93,14 @@ const TableSection = ({
                     </td>
                   );
                 })}
-                <td className="px-4 py-3">
+                {/* <td className="px-4 py-3">
                   <button
                     className="bg-white border border-gray-200 text-gray-700 rounded-sm text-xs px-2 py-1"
                     aria-label="View verification request"
                   >
                     View
                   </button>
-                </td>
+                </td> */}
               </tr>
             ))
           )}

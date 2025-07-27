@@ -15,15 +15,52 @@ export default function AgentRegistration() {
   const [, setEndDate] = useState("");
   const [selectedregistrationRequest, setSelectedregistrationRequest] =
     useState<AgentDetailedInfo | null>(null);
-  const { data: inspectionData, isLoading: inspectionLoading } =
-    useGetInspectionOverviewQuery({});
 
-  // ✅ Callback for date range change
-  const handleDateChange = (start: string, end: string) => {
-    setStartDate(start);
-    setEndDate(end);
-    // Optional: filter `agents` based on `createdAt` within range here
+  const [filters, setFilters] = useState(() => {
+    const today = new Date();
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    return {
+      search: "",
+      date_from: sevenDaysAgo.toISOString().split("T")[0],
+      date_to: today.toISOString().split("T")[0],
+      page: 1,
+      page_size: 6,
+      search_by_day: 0,
+    };
+  });
+  const queryParams = {
+    ...filters,
+    search_by_day: filters.search_by_day || undefined, // Remove if 0 or empty
+    search: filters.search || undefined,
+    page: filters.page.toString(),
+    page_size: filters.page_size.toString(),
   };
+  const { data: inspectionData, isLoading: inspectionLoading } =
+    useGetInspectionOverviewQuery(
+      Object.fromEntries(
+        Object.entries(queryParams).filter(([_, value]) => value !== undefined)
+      )
+    );
+
+  const handleDateChange = (start: string, end: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      date_from: start,
+      date_to: end,
+      page: 1, // Reset page when dates change
+      search_by_day: 0, // Reset search by day when using date range
+    }));
+  };
+
+  if (inspectionLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#EC5F34]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-6 md:px-12 py-6">
@@ -79,6 +116,11 @@ export default function AgentRegistration() {
             selectedregistrationRequest={selectedregistrationRequest}
             setselectedRegistrationRequest={setSelectedregistrationRequest}
             agents={inspectionData?.inspections?.data || []}
+            filters={filters}
+            setFilters={setFilters}
+            totalPages={Math.ceil(
+              (inspectionData?.inspections?.total || 0) / filters.page_size
+            )}
           />
         )}
       </div>

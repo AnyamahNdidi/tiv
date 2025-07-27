@@ -163,7 +163,7 @@ const TenantOverViewDetails: React.FC<TenantDetailsProps> = ({
             </div>
           </div>
 
-          <div className="flex gap-2 flex-wrap">
+          {/* <div className="flex gap-2 flex-wrap">
             <button
               className="border border-gray-200 bg-white text-sm px-4 py-2 hover:bg-gray-200 cursor-pointer rounded-lg"
               onClick={() => setShowEditModal(true)}
@@ -177,7 +177,7 @@ const TenantOverViewDetails: React.FC<TenantDetailsProps> = ({
             >
               Deactivate
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Tenant Details */}

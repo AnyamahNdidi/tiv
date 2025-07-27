@@ -111,7 +111,7 @@ export default function LandlordProfile({ landlord, onBack, params }: Props) {
 
   return (
     <div className="p-4 sm:p-6 space-y-6 min-h-screen max-w-screen">
-      {showEditModal && (
+      {/* {showEditModal && (
         <ModalWrapper onClose={() => setShowEditModal(false)}>
           <EditProfileModal onClose={() => setShowEditModal(false)} />
         </ModalWrapper>
@@ -120,7 +120,7 @@ export default function LandlordProfile({ landlord, onBack, params }: Props) {
         <ModalWrapper onClose={() => setShowDeactivateModal(false)}>
           <DeactivateModal onClose={() => setShowDeactivateModal(false)} />
         </ModalWrapper>
-      )}
+      )} */}
 
       <div
         className={`space-y-6 max-w-6xl mx-auto ${
@@ -156,7 +156,7 @@ export default function LandlordProfile({ landlord, onBack, params }: Props) {
               ).toLocaleDateString()}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          {/* <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setShowEditModal(true)}
               className="border border-gray-300 bg-white text-sm px-3 py-1.5 hover:bg-gray-100 rounded-lg"
@@ -169,7 +169,7 @@ export default function LandlordProfile({ landlord, onBack, params }: Props) {
             >
               Deactivate
             </button>
-          </div>
+          </div> */}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">

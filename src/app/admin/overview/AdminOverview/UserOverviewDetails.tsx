@@ -16,6 +16,7 @@ import { Icon } from "@iconify/react";
 import VerifyUserModal from "./VerifyUserModal";
 import VerifyBVNModal from "./VerifyBVNModal";
 import BlockUserModal from "./BlockUserModal";
+import UnblockUserModal from "./UnblockUserModal";
 
 interface UserDetailsProps {
   user: {
@@ -66,8 +67,7 @@ const UserOverviewDetails: React.FC<UserDetailsProps> = ({
   const [showVerifyUserModal, setShowVerifyUserModal] = useState(false);
   const [showVerifyBVNModal, setShowVerifyBVNModal] = useState(false);
   const [showBlockUserModal, setShowBlockUserModal] = useState(false);
-
-  console.log("o boy", user);
+  const [showUnblockUserModal, setShowUnblockUserModal] = useState(false);
 
   return (
     <div className="p-4 sm:p-6 space-y-6 min-h-screen max-w-screen">
@@ -105,6 +105,14 @@ const UserOverviewDetails: React.FC<UserDetailsProps> = ({
           />
         </ModalWrapper>
       )}
+      {showUnblockUserModal && (
+        <ModalWrapper onClose={() => setShowUnblockUserModal(false)}>
+          <UnblockUserModal
+            onClose={() => setShowUnblockUserModal(false)}
+            userId={userId}
+          />
+        </ModalWrapper>
+      )}
 
       <div
         className={`space-y-6 max-w-6xl mx-auto ${
@@ -124,14 +132,14 @@ const UserOverviewDetails: React.FC<UserDetailsProps> = ({
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-                {user.user_info.first_name} {user.user_info.last_name}
+                {user?.user_info.first_name} {user?.user_info.last_name}
               </h2>
               <span className="text-xs font-medium px-2.5 py-0.5 rounded-full">
-                <StatusBadge status={user.user_info.active_user} />
+                <StatusBadge status={user?.user_info.active_user} />
               </span>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
+          {/* <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setShowEditModal(true)}
               className="border border-gray-300 bg-white text-sm px-3 py-1.5 hover:bg-gray-100 rounded-lg"
@@ -144,25 +152,25 @@ const UserOverviewDetails: React.FC<UserDetailsProps> = ({
             >
               Deactivate
             </button>
-          </div>
+          </div> */}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard
             title="Available Tokens"
-            value={user.user_info.total_available_token}
+            value={user?.user_info.total_available_token}
           />
           <StatCard
             title="Wallet Balance"
-            value={`₦${user.user_info.Wallet_balance}`}
+            value={`₦${user?.user_info.Wallet_balance}`}
           />
           <StatCard
             title="Total Properties"
-            value={user.summary.total_property_added}
+            value={user?.summary.total_property_added}
           />
           <StatCard
             title="Total Tenants"
-            value={user.summary.total_tenant_added}
+            value={user?.summary.total_tenant_added}
           />
         </div>
 
@@ -175,35 +183,35 @@ const UserOverviewDetails: React.FC<UserDetailsProps> = ({
               <div>
                 <p className="text-gray-500">Full Name</p>
                 <p className="font-medium">
-                  {user.user_info.first_name} {user.user_info.last_name}
+                  {user?.user_info.first_name} {user.user_info.last_name}
                 </p>
               </div>
               <div>
                 <p className="text-gray-500">Email</p>
-                <p className="font-medium">{user.user_info.email}</p>
+                <p className="font-medium">{user?.user_info.email}</p>
               </div>
               <div>
                 <p className="text-gray-500">Phone Number</p>
-                <p className="font-medium">{user.user_info.phone}</p>
+                <p className="font-medium">{user?.user_info.phone}</p>
               </div>
             </div>
             <div className="space-y-4">
               <div>
                 <p className="text-gray-500">Verifications Done</p>
                 <p className="font-medium">
-                  {user.user_info.total_verification_done}
+                  {user?.user_info.total_verification_done}
                 </p>
               </div>
               <div>
                 <p className="text-gray-500">Verifications Logged</p>
                 <p className="font-medium">
-                  {user.summary.total_verifications_logged}
+                  {user?.summary.total_verifications_logged}
                 </p>
               </div>
               <div>
                 <p className="text-gray-500">Status</p>
                 <p className="font-medium">
-                  <StatusBadge status={user.user_info.active_user} />
+                  <StatusBadge status={user?.user_info.active_user} />
                 </p>
               </div>
             </div>
@@ -236,6 +244,13 @@ const UserOverviewDetails: React.FC<UserDetailsProps> = ({
               <Icon icon="mdi:block-helper" className="w-5 h-5" />
               Block User
             </button>
+            <button
+              onClick={() => setShowUnblockUserModal(true)}
+              className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+            >
+              <Icon icon="mdi:lock-open" className="w-5 h-5" />
+              Unblock User
+            </button>
           </div>
         </div>
 
@@ -258,10 +273,10 @@ const UserOverviewDetails: React.FC<UserDetailsProps> = ({
               { label: "Email", key: "email" },
               { label: "Phone", key: "phone" },
               { label: "Date", key: "date" },
-              { label: "Status", key: "status" },
-              { label: "Address", key: "address" },
+              // { label: "Status", key: "status" },
+              // { label: "Address", key: "address" },
             ]}
-            data={user.verification_list.data.map((item: any) => ({
+            data={user?.verification_list.data.map((item: any) => ({
               full_name:
                 item.full_name || `${item.first_name} ${item.last_name}`,
               email: item.email,

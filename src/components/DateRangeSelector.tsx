@@ -10,12 +10,18 @@ interface DateRangeSelectorProps {
 }
 
 const formatDate = (date: Date): string => {
-  const options: Intl.DateTimeFormatOptions = {
+  // Format for display
+  const displayOptions: Intl.DateTimeFormatOptions = {
     month: "short",
     day: "numeric",
     year: "numeric",
   };
-  return date.toLocaleDateString("en-US", options);
+  const displayDate = date.toLocaleDateString("en-US", displayOptions);
+
+  // Format for API (YYYY-MM-DD)
+  const apiDate = date.toISOString().split("T")[0];
+
+  return apiDate; // Return the API format
 };
 
 const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
@@ -27,25 +33,37 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
   const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
-    const updateDateRange = () => {
-      const today = new Date();
-      setEndDate(formatDate(today));
-
-      const rangeMapping: Record<DateRangeLabel, number> = {
-        "Last 7 Days": 7,
-        "Last 14 Days": 14,
-        "Last 30 Days": 30,
-      };
-
-      const newStart = new Date(today);
-      newStart.setDate(today.getDate() - rangeMapping[dateRangeLabel]);
-      const formattedStart = formatDate(newStart);
-      setStartDate(formattedStart);
-      onDateChange(formattedStart, formatDate(today));
+    const today = new Date();
+    const rangeMapping: Record<DateRangeLabel, number> = {
+      "Last 7 Days": 7,
+      "Last 14 Days": 14,
+      "Last 30 Days": 30,
     };
 
-    updateDateRange();
-  }, [dateRangeLabel, onDateChange]);
+    const newStart = new Date(today);
+    newStart.setDate(today.getDate() - rangeMapping[dateRangeLabel]);
+    const formattedStart = formatDate(newStart);
+    const formattedEnd = formatDate(today);
+
+    setStartDate(formattedStart);
+    setEndDate(formattedEnd);
+
+    // Debounce the onDateChange call to prevent rapid updates
+    const timeoutId = setTimeout(() => {
+      onDateChange(formattedStart, formattedEnd);
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [dateRangeLabel]);
+
+  const formatDisplayDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
 
   return (
     <div className="flex flex-col sm:flex-row justify-between items-center gap-4 py-5 px-4 lg:px-12">
@@ -71,11 +89,11 @@ const DateRangeSelector: React.FC<DateRangeSelectorProps> = ({
       {/* Display Date Range */}
       <div className="flex gap-2 items-center text-sm">
         <span className="bg-gray-200 rounded-sm w-[120px] h-8 flex items-center justify-center text-center">
-          {startDate}
+          {formatDisplayDate(startDate)}
         </span>
         <span>-</span>
         <span className="bg-gray-200 rounded-sm w-[120px] h-8 flex items-center justify-center text-center">
-          {endDate}
+          {formatDisplayDate(endDate)}
         </span>
       </div>
     </div>

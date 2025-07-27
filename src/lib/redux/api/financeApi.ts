@@ -24,7 +24,16 @@ export const financeApi = createApi({
       providesTags: ["Finance"],
     }),
     getFinanceRevenueDump: builder.query({
-      query: () => "/finance/revenue/dump/",
+      query: (params) => ({
+        url: "/finance/revenue/dump/",
+        params: {
+          search: params?.search,
+          date_from: params?.date_from,
+          date_to: params?.date_to,
+          page: params?.page,
+          page_size: params?.page_size,
+        },
+      }),
       providesTags: ["Finance"],
     }),
     getAllCoupons: builder.query({

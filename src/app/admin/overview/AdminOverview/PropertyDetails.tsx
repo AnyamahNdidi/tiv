@@ -114,7 +114,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center space-x-3">
+          {/* <div className="flex items-center space-x-3">
             <button
               className="border border-gray-200 bg-white text-sm px-4 py-2 hover:bg-gray-200 cursor-pointer rounded-lg"
               onClick={() => setShowEditModal(true)}
@@ -128,7 +128,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({
             >
               Delete property
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Property Details */}
@@ -240,9 +240,9 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({
                         <td className="py-3 px-4 text-gray-700">
                           {record?.renewal_date}
                         </td>
-                        <td>
+                        {/* <td>
                           <StatusBadge status="View profile" />
-                        </td>
+                        </td> */}
                       </tr>
                     ))}
                   </tbody>

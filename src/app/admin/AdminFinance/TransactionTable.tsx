@@ -21,11 +21,34 @@ interface TransactionTableProps {
   selectedTransaction: Transaction | null;
   setSelectedTransaction: (transaction: Transaction | null) => void;
   transactionData: Transaction[];
+  filters: {
+    search: string;
+    date_from: string;
+    date_to: string;
+    page: number;
+    page_size: number;
+  };
+  setFilters: React.Dispatch<
+    React.SetStateAction<{
+      search: string;
+      date_from: string;
+      date_to: string;
+      page: number;
+      page_size: number;
+    }>
+  >;
+  revenueDump?: {
+    total: number;
+    data: Transaction[];
+  };
 }
 
 const TransactionTable: React.FC<TransactionTableProps> = ({
   setSelectedTransaction,
   transactionData,
+  filters,
+  setFilters,
+  revenueDump,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
@@ -50,6 +73,28 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   }, [currentPage, itemsPerPage, filteredTransactions]);
 
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  const handleSearch = (value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      search: value,
+      page: 1, // Reset page when searching
+    }));
+  };
+
+  const handleItemsPerPageChange = (value: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page_size: value,
+      page: 1,
+    }));
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page: newPage,
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -64,8 +109,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             type="text"
             placeholder="Search by name, email or transaction ID"
             className="pl-10 pr-4 py-2 w-full text-gray-500 rounded-lg bg-white"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={filters.search}
+            onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
       </div>
@@ -87,43 +132,90 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               </tr>
             </thead>
             <tbody>
-              {paginatedTransactions.map((transaction) => (
-                <tr
-                  key={transaction.id}
-                  className="border-t border-gray-100 text-sm"
-                >
-                  <td className="py-5 px-4">#{transaction.transaction_id}</td>
-                  <td className="py-3 px-4">{transaction.user.name}</td>
-                  <td className="py-3 px-4">{transaction.user.email}</td>
-                  <td className="py-3 px-4">
-                    <StatusBadge status={transaction.status} />
-                  </td>
-                  <td className="py-3 px-4">{transaction.plan}</td>
-                  <td className="py-3 px-4">
-                    ₦{transaction.amount.toLocaleString()}
-                  </td>
-                  <td className="py-3 px-4">
-                    {new Date(transaction.date).toLocaleDateString()}
-                  </td>
-                  <td
-                    className="py-3 px-4 font-medium text-gray-700 cursor-pointer"
-                    onClick={() => setSelectedTransaction(transaction)}
-                  >
-                    <StatusBadge status="View transaction" />
+              {transactionData.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-8 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Icon
+                        icon="mingcute:search-3-line"
+                        className="w-12 h-12 text-gray-400"
+                      />
+                      <p className="text-gray-500 text-lg">
+                        {filters.search
+                          ? "No results found"
+                          : "No transactions available"}
+                      </p>
+                      <p className="text-gray-400 text-sm">
+                        {filters.search
+                          ? "Try adjusting your search"
+                          : "Check back later"}
+                      </p>
+                    </div>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                transactionData?.map((transaction) => (
+                  <tr
+                    key={transaction.id}
+                    className="border-t border-gray-100 text-sm"
+                  >
+                    <td className="py-5 px-4">#{transaction.transaction_id}</td>
+                    <td className="py-3 px-4">{transaction.user.name}</td>
+                    <td className="py-3 px-4">{transaction.user.email}</td>
+                    <td className="py-3 px-4">
+                      <StatusBadge status={transaction.status} />
+                    </td>
+                    <td className="py-3 px-4">{transaction.plan}</td>
+                    <td className="py-3 px-4">
+                      ₦{transaction.amount.toLocaleString()}
+                    </td>
+                    <td className="py-3 px-4">
+                      {new Date(transaction.date).toLocaleDateString()}
+                    </td>
+                    <td
+                      className="py-3 px-4 font-medium text-gray-700 cursor-pointer"
+                      onClick={() => setSelectedTransaction(transaction)}
+                    >
+                      <StatusBadge status="View transaction" />
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
-        <PaginationControls
+        {/* <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}
           setCurrentPage={setCurrentPage}
           itemsPerPage={itemsPerPage}
           setItemsPerPage={setItemsPerPage}
-        />
+        /> */}
+        <div className="flex justify-between items-center mt-4">
+          <div className="flex items-center gap-2">
+            <select
+              value={filters.page_size}
+              onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+              className="border rounded px-2 py-1"
+            >
+              <option value={6}>6</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+            </select>
+            <span className="text-sm text-gray-600">per page</span>
+          </div>
+
+          <PaginationControls
+            currentPage={filters.page}
+            totalPages={Math.ceil(
+              (revenueDump?.total || 0) / filters.page_size
+            )}
+            setCurrentPage={handlePageChange}
+            itemsPerPage={filters.page_size}
+            setItemsPerPage={handleItemsPerPageChange}
+          />
+        </div>
       </div>
     </div>
   );

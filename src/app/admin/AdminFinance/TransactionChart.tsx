@@ -201,7 +201,7 @@ const TransactionChart: React.FC<TransactionChartProps> = ({ dailyData }) => {
                   Total
                 </tspan>
                 <tspan x="50%" dy="10%" fontSize={20} fontWeight="bold">
-                  ${tenantManagement.totalFunded.toLocaleString()}
+                  ₦{tenantManagement.totalFunded.toLocaleString()}
                 </tspan>
               </text>
             </PieChart>
@@ -212,14 +212,14 @@ const TransactionChart: React.FC<TransactionChartProps> = ({ dailyData }) => {
               <span className="w-3 h-1 rounded bg-[#EC5F34]" />
               <span className="font-semibold text-gray-500">Active</span>
               <span className="font-semibold">
-                ${tenantManagement.availableFund.toLocaleString()}
+                ₦{tenantManagement.availableFund.toLocaleString()}
               </span>
             </div>
             <div className="flex items-center gap-2 text-[7px] md:text-[9px] lg:text-[10px] xl:text-[12px]">
               <span className="w-3 h-1 rounded bg-[#4B4B4B]" />
               <span className="font-semibold text-gray-500">Inactive</span>
               <span className="font-semibold">
-                ${tenantManagement.tenantCharge.toLocaleString()}
+                ₦{tenantManagement.tenantCharge.toLocaleString()}
               </span>
             </div>
           </div>
@@ -264,7 +264,7 @@ const TransactionChart: React.FC<TransactionChartProps> = ({ dailyData }) => {
                   Total Received
                 </tspan>
                 <tspan x="50%" dy="10%" fontSize={20} fontWeight="bold">
-                  ${inspectionRevenue.totalReceived.toLocaleString()}
+                  ₦{inspectionRevenue.totalReceived.toLocaleString()}
                 </tspan>
               </text>
             </PieChart>
@@ -275,14 +275,14 @@ const TransactionChart: React.FC<TransactionChartProps> = ({ dailyData }) => {
               <span className="w-3 h-1 rounded bg-[#EC5F34]" />
               <span className="font-semibold text-gray-500">Agent Paid</span>
               <span className="font-semibold">
-                ${inspectionRevenue.agentPaid.toLocaleString()}
+                ₦{inspectionRevenue.agentPaid.toLocaleString()}
               </span>
             </div>
             <div className="flex items-center gap-2 text-[7px] md:text-[9px] lg:text-[10px] xl:text-[12px]">
               <span className="w-3 h-1 rounded bg-[#4B4B4B]" />
               <span className="font-semibold text-gray-500">Revenue</span>
               <span className="font-semibold">
-                ${inspectionRevenue.revenueGenerated.toLocaleString()}
+                ₦{inspectionRevenue.revenueGenerated.toLocaleString()}
               </span>
             </div>
           </div>

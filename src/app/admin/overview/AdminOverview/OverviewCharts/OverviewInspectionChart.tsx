@@ -58,7 +58,7 @@ const OverviewInspectionChart: React.FC<InspectionChartProps> = ({ data }) => {
       </div>
 
       {/* Pie Charts */}
-      <div className="flex flex-col lg:flex-row gap-8 md:gap-10 justify-between">
+      <div className="flex flex-col lg:flex-row gap-8 md:gap-10 justify-center">
         {/* Agents Chart */}
         <div className="w-full lg:w-1/2 bg-white shadow-md rounded-lg flex flex-col items-center">
           <div className="w-full px-6 pt-6">
@@ -119,7 +119,7 @@ const OverviewInspectionChart: React.FC<InspectionChartProps> = ({ data }) => {
         </div>
 
         {/* Revenue Chart */}
-        <div className="w-full lg:w-1/2 bg-white shadow-md rounded-lg flex flex-col items-center">
+        {/* <div className="w-full lg:w-1/2 bg-white shadow-md rounded-lg flex flex-col items-center">
           <div className="w-full px-6 pt-6">
             <h3 className="text-sm text-gray-700 font-semibold text-start mb-4">
               Inspection Revenue Generated
@@ -175,7 +175,7 @@ const OverviewInspectionChart: React.FC<InspectionChartProps> = ({ data }) => {
               <span className="font-semibold">{data.total_pending}</span>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

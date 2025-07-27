@@ -22,7 +22,7 @@ import {
 const UserSeetings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { data: userOverviewData, isLoading: isLoadingUsers } =
-    useGetUserOverviewQuery();
+    useGetUserOverviewQuery({});
   const [userManagement, setUserManagement] = useState({
     userId: "",
     blockReason: "",
@@ -106,7 +106,7 @@ const UserSeetings = () => {
                   <SelectValue placeholder="Select a user" />
                 </SelectTrigger>
                 <SelectContent>
-                  {userOverviewData?.users.data.map((user) => (
+                  {userOverviewData?.users.data.map((user: any) => (
                     <SelectItem key={user.id} value={user.id.toString()}>
                       {user.full_name} ({user.email})
                     </SelectItem>

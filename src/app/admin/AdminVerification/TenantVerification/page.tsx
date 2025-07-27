@@ -9,11 +9,16 @@ export default function Verification() {
   const [selectedRequest, setSelectedRequest] = useState<RequestData | null>(
     null
   );
+  const [filters, setFilters] = useState({
+    search: "",
+    page: 1,
+    page_size: 6,
+  });
   const {
     data: verificationRequests,
     isLoading,
     error,
-  } = useGetVerificationRequestsQuery({});
+  } = useGetVerificationRequestsQuery(filters);
 
   if (isLoading) {
     return (
@@ -41,6 +46,8 @@ export default function Verification() {
           selectedRequest={selectedRequest}
           setSelectedRequest={setSelectedRequest as any}
           verificationData={verificationRequests}
+          filters={filters}
+          setFilters={setFilters}
         />
       )}
     </div>

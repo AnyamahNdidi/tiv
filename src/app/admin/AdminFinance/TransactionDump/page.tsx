@@ -34,12 +34,50 @@ interface TenantTransaction {
 export default function TransactionDump() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  // const [selectedTransaction, setSelectedTransaction] =
+  //   useState<Transaction | null>(null);
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
+  // const [filters, setFilters] = useState({
+  //   search: "",
+  //   date_from: "",
+  //   date_to: "",
+  //   page: 1,
+  //   page_size: 6,
+  // });
 
-  const { data: revenueDump, isLoading } = useGetFinanceRevenueDumpQuery({});
+  const [filters, setFilters] = useState(() => {
+    const today = new Date();
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    return {
+      search: "",
+      date_from: sevenDaysAgo.toISOString().split("T")[0],
+      date_to: today.toISOString().split("T")[0],
+      page: 1,
+      page_size: 6,
+    };
+  });
+
+  const { data: revenueDump, isLoading } = useGetFinanceRevenueDumpQuery(
+    Object.fromEntries(
+      Object.entries(filters).filter(([_, value]) => value !== "")
+    )
+  );
+
+  // const { data: revenueDump, isLoading } = useGetFinanceRevenueDumpQuery({});
 
   const transactions = revenueDump?.transactions?.data || [];
+
+  const handleDateChange = (start: string, end: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      date_from: start,
+      date_to: end,
+      page: 1,
+    }));
+  };
 
   return (
     <div className="p-4 sm:p-6 md:p-12 w-full max-w-screen overflow-x-hidden">
@@ -49,12 +87,7 @@ export default function TransactionDump() {
             Transaction
           </h1>
 
-          <DateRangeSelector
-            onDateChange={(start, end) => {
-              setStartDate(start);
-              setEndDate(end);
-            }}
-          />
+          <DateRangeSelector onDateChange={handleDateChange} />
         </>
       )}
 
@@ -72,6 +105,9 @@ export default function TransactionDump() {
           selectedTransaction={selectedTransaction}
           setSelectedTransaction={setSelectedTransaction}
           transactionData={transactions}
+          filters={filters}
+          setFilters={setFilters}
+          revenueDump={revenueDump?.transactions}
         />
       )}
     </div>

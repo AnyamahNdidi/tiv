@@ -9,6 +9,11 @@ export default function Task() {
   const [selectedTask, setSelectedTask] = useState<TaskData | null>(null);
   const { data: verificationData, isLoading } =
     useGetWorkplaceVerificationsQuery({});
+  const [filters, setFilters] = useState({
+    search: "",
+    page: 1,
+    page_size: 6,
+  });
 
   return (
     <main className="">
@@ -22,6 +27,8 @@ export default function Task() {
           selectedTask={selectedTask}
           setSelectedTask={setSelectedTask}
           verificationData={verificationData}
+          filters={filters}
+          setFilters={setFilters}
         />
       )}
     </main>

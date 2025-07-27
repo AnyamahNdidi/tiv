@@ -20,7 +20,14 @@ export const verificationApi = createApi({
   tagTypes: ["Verification"],
   endpoints: (builder) => ({
     getVerificationRequests: builder.query({
-      query: () => "/verification/request/",
+      query: (params) => ({
+        url: "/verification/request/",
+        params: {
+          search: params?.search,
+          page: params?.page,
+          page_size: params?.page_size,
+        },
+      }),
       providesTags: ["Verification"],
     }),
     getVerificationDetail: builder.query({
@@ -28,7 +35,14 @@ export const verificationApi = createApi({
       providesTags: ["Verification"],
     }),
     getWorkplaceVerifications: builder.query({
-      query: () => "/verification/task/docment/",
+      query: (params) => ({
+        url: "/verification/task/docment/",
+        params: {
+          search: params?.search,
+          page: params?.page,
+          page_size: params?.page_size,
+        },
+      }),
       providesTags: ["Verification"],
     }),
     getUploadedDocuments: builder.query({
@@ -44,7 +58,17 @@ export const verificationApi = createApi({
       invalidatesTags: ["Verification"],
     }),
     getVerificationProfile: builder.query({
-      query: () => "/verification/profile/",
+      query: (params) => ({
+        url: "/verification/profile/",
+        params: {
+          search: params?.search,
+          search_by_day: params?.search_by_day,
+          date_from: params?.date_from,
+          date_to: params?.date_to,
+          page: params?.page,
+          page_size: params?.page_size,
+        },
+      }),
       providesTags: ["Verification"],
     }),
     getUserVerificationSummary: builder.query({

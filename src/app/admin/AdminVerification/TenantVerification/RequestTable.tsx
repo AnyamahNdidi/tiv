@@ -26,9 +26,24 @@ interface RequestTableProps {
       total_passed: number;
       total_pending: number;
       total_failed: number;
+      // total: number;
     };
     data: VerificationRequest[];
+    total: number; // Add this property
+    total_pages: number; // Add this for pagination
   };
+  filters: {
+    search: string;
+    page: number;
+    page_size: number;
+  };
+  setFilters: React.Dispatch<
+    React.SetStateAction<{
+      search: string;
+      page: number;
+      page_size: number;
+    }>
+  >;
 }
 const ITEMS_PER_PAGE = 6;
 
@@ -36,10 +51,13 @@ export default function RequestTable({
   selectedRequest,
   setSelectedRequest,
   verificationData,
+  filters,
+  setFilters,
 }: RequestTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
   // const { summary, data: requests } = verificationData;
   console.log("request data", verificationData);
@@ -66,7 +84,17 @@ export default function RequestTable({
     );
   });
 
-  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+  const handleSearch = (value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      search: value,
+      page: 1, // Reset page when searching
+    }));
+  };
+  // const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+  const totalPages = Math.ceil(
+    (verificationData?.total || 0) / filters.page_size
+  );
 
   const paginatedRequests = filteredRequests.slice(
     (currentPage - 1) * itemsPerPage,
@@ -80,6 +108,22 @@ export default function RequestTable({
   const handlePrevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
+
+  const handlePageChange = (newPage: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page: newPage,
+    }));
+  };
+
+  const handleItemsPerPageChange = (value: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page_size: value,
+      page: 1,
+    }));
+  };
+  const tableData = verificationData?.data || [];
 
   return (
     <div className="w-full overflow-x-hidden">
@@ -126,12 +170,15 @@ export default function RequestTable({
                   type="text"
                   placeholder="Search by ID, name or email"
                   className="pl-10 pr-4 py-2 w-full text-sm text-gray-500 rounded-lg bg-white border border-gray-200"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={filters.search}
+                  onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
-
-              <div className="flex p-3 gap-2 bg-white rounded-xl justify-center items-center cursor-pointer w-fit">
+              {/* 
+              <div
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex p-3 gap-2 bg-white rounded-xl justify-center items-center cursor-pointer w-fit"
+              >
                 <Icon
                   icon="icon-park-outline:filter"
                   width="16"
@@ -139,8 +186,31 @@ export default function RequestTable({
                   className="text-gray-400"
                 />
                 <p className="text-sm">Filters</p>
-              </div>
+              </div> */}
             </div>
+
+            {/* {showFilters && (
+              <div className="bg-white p-4 rounded-lg shadow space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-gray-600">
+                      Items per page
+                    </label>
+                    <select
+                      value={filters.page_size}
+                      onChange={(e) =>
+                        handleItemsPerPageChange(Number(e.target.value))
+                      }
+                      className="w-full mt-1 p-2 border rounded"
+                    >
+                      <option value={6}>6</option>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )} */}
 
             {/* Table */}
             <div className="bg-white shadow rounded-lg p-2 overflow-x-auto">
@@ -164,47 +234,83 @@ export default function RequestTable({
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedRequests.map((request) => (
-                    <tr
-                      key={request.id}
-                      className="border-t border-gray-100 text-gray-700"
-                    >
-                      <td className="py-3 px-4">{request.id}</td>
-                      <td className="py-3 px-4 flex items-center gap-3">
-                        <span className="w-8 h-8 flex items-center justify-center bg-red-100 text-red-600 rounded-full font-semibold text-sm">
-                          {request.landlord_name.charAt(0)}
-                        </span>
-                        {request.landlord_name}
-                      </td>
-                      <td className="py-3 px-4">{request.full_name}</td>
-                      <td className="py-3 px-4">{request.email}</td>
-                      <td className="py-3 px-4">{request.phone}</td>
-                      <td className="py-3 px-4">
-                        {new Date(request.date_requested).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          }
-                        )}
-                      </td>
-                      <td
-                        className="py-3 px-4 font-medium text-gray-700 cursor-pointer"
-                        onClick={() => {}}
-                      >
-                        <StatusBadge status={request.status} />
-                      </td>
-                      <td
-                        className="py-3 px-4 cursor-pointer"
-                        // onClick={() => setSelectedRequest(request as any)}
-                      >
-                        <Link href={`TenantVerification/${request.id}`}>
-                          <StatusBadge status="View profile" />
-                        </Link>
+                  {tableData.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="py-8 text-center">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <Icon
+                            icon="mingcute:search-3-line"
+                            className="w-12 h-12 text-gray-400"
+                          />
+                          <p className="text-gray-500 text-lg">
+                            No results found
+                          </p>
+                          <p className="text-gray-400 text-sm">
+                            Try adjusting your search criteria
+                          </p>
+                        </div>
                       </td>
                     </tr>
-                  ))}
+                  ) : tableData.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="py-8 text-center">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <Icon
+                            icon="mingcute:search-3-line"
+                            className="w-12 h-12 text-gray-400"
+                          />
+                          <p className="text-gray-500 text-lg">
+                            No results found
+                          </p>
+                          <p className="text-gray-400 text-sm">
+                            Try adjusting your search criteria
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    paginatedRequests.map((request) => (
+                      <tr
+                        key={request.id}
+                        className="border-t border-gray-100 text-gray-700"
+                      >
+                        <td className="py-3 px-4">{request.id}</td>
+                        <td className="py-3 px-4 flex items-center gap-3">
+                          <span className="w-8 h-8 flex items-center justify-center bg-red-100 text-red-600 rounded-full font-semibold text-sm">
+                            {request.landlord_name.charAt(0)}
+                          </span>
+                          {request.landlord_name}
+                        </td>
+                        <td className="py-3 px-4">{request.full_name}</td>
+                        <td className="py-3 px-4">{request.email}</td>
+                        <td className="py-3 px-4">{request.phone}</td>
+                        <td className="py-3 px-4">
+                          {new Date(request.date_requested).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
+                        </td>
+                        <td
+                          className="py-3 px-4 font-medium text-gray-700 cursor-pointer"
+                          onClick={() => {}}
+                        >
+                          <StatusBadge status={request.status} />
+                        </td>
+                        <td
+                          className="py-3 px-4 cursor-pointer"
+                          // onClick={() => setSelectedRequest(request as any)}
+                        >
+                          <Link href={`TenantVerification/${request.id}`}>
+                            <StatusBadge status="View profile" />
+                          </Link>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

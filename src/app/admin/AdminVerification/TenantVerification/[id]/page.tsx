@@ -86,7 +86,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
               </p>
             </div>
 
-            <div className="flex gap-2">
+            {/* <div className="flex gap-2">
               <button className="px-4 py-2 rounded text-gray-700 bg-white text-sm font-semibold cursor-pointer">
                 Accept
               </button>
@@ -96,7 +96,7 @@ const RequestDetails: React.FC<RequestDetailsProps> = ({
               >
                 Reject
               </button>
-            </div>
+            </div> */}
           </div>
 
           {/* Request Details */}
